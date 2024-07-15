@@ -65,6 +65,7 @@ from typing_extensions import Annotated
 from watchfiles import awatch
 
 ROOT_PATH = os.environ.get("CHAINLIT_ROOT_PATH", "")
+SIO_PATH = os.environ.get("CHAINLIT_SIO_PATH", ROOT_PATH)
 IS_SUBMOUNT = os.environ.get("CHAINLIT_SUBMOUNT", "") == "true"
 
 
@@ -199,7 +200,7 @@ sio = socketio.AsyncServer(
 combined_asgi_app = socketio.ASGIApp(
     sio,
     app,
-    socketio_path=f"{ROOT_PATH}/ws/socket.io" if ROOT_PATH else "/ws/socket.io",
+    socketio_path=f"{SIO_PATH}/ws/socket.io" if SIO_PATH else "/ws/socket.io",
 )
 
 app.add_middleware(
