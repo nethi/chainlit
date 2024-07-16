@@ -67,10 +67,14 @@ const useChatSession = () => {
   const _connect = useCallback(
     ({
       userEnv,
-      accessToken
+      accessToken,
+      ws_path,
+      ws_options
     }: {
       userEnv: Record<string, string>;
       accessToken?: string;
+      ws_path?: string;
+      ws_options?: Object;
     }) => {
       const { protocol, host, pathname } = new URL(client.httpEndpoint);
       const uri = `${protocol}//${host}`;
@@ -79,8 +83,9 @@ const useChatSession = () => {
           ? `${pathname}/ws/socket.io`
           : '/ws/socket.io';
 
-      const socket = io(uri, {
-        path,
+      const final_path = ws_path ? ws_path : path;
+      const options = {
+        final_path,
         extraHeaders: {
           Authorization: accessToken || '',
           'X-Chainlit-Client-Type': client.type,
@@ -91,7 +96,11 @@ const useChatSession = () => {
             ? encodeURIComponent(chatProfile)
             : ''
         }
-      });
+      }
+      if (ws_options) {
+        Object.assign(options, ws_options)
+      }
+      const socket = io(uri, options);
       setSession((old) => {
         old?.socket?.removeAllListeners();
         old?.socket?.close();
