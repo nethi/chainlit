@@ -116,7 +116,8 @@ def check_file(target: str):
 
 def mount_chainlit(app: FastAPI, target: str, path="/chainlit", sio_path=None):
     os.environ["CHAINLIT_ROOT_PATH"] = path
-    os.environ["CHAINLIT_SIO_PATH"] = sio_path 
+    if sio_path:
+        os.environ["CHAINLIT_SIO_PATH"] = sio_path 
     os.environ["CHAINLIT_SUBMOUNT"] = "false"
     from chainlit.config import config, load_module
     from chainlit.server import combined_asgi_app as chainlit_app
