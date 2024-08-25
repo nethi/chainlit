@@ -120,7 +120,7 @@ def mount_chainlit(app: FastAPI, target: str, path="/chainlit", sio_path=None):
         os.environ["CHAINLIT_SIO_PATH"] = sio_path 
     os.environ["CHAINLIT_SUBMOUNT"] = "false"
     from chainlit.config import config, load_module
-    from chainlit.server import combined_asgi_app as chainlit_app
+    from chainlit.server import app as chainlit_app
 
     config.run.root_path = path
     config.run.debug = os.environ.get("CHAINLIT_DEBUG", False)
