@@ -100,7 +100,7 @@ def build_anon_user_identifier(environ):
 
 
 @sio.on("connect")
-async def connect(sid, environ):
+async def connect(sid, environ, auth=None):
     if (
         not config.code.on_chat_start
         and not config.code.on_message
@@ -117,10 +117,12 @@ async def connect(sid, environ):
         # Check if the authentication is required
         if login_required:
             authorization_header = environ.get("HTTP_AUTHORIZATION")
+            if authorization_header is None:
+                authorization_header = auth["token"] if auth else None
             token = authorization_header.split(" ")[1] if authorization_header else None
             user = await get_current_user(token=token)
     except Exception:
-        logger.info("Authentication failed")
+        logger.info("Authentication failed: {e}")
         return False
 
     # Session scoped function to emit to the client
