@@ -99,6 +99,16 @@ def build_anon_user_identifier(environ):
         return str(uuid.uuid5(uuid.NAMESPACE_DNS, ip))
 
 
+def get_ws_header_parameter(environ, header_name):
+    from urllib.parse import parse_qs
+    query_string = environ.get('QUERY_STRING', '')
+    query_params = parse_qs(query_string)
+    value =  query_params.get(header_name, [None])[0]
+    if value is None:
+        value = environ.get(f"HTTP_{header_name.replace('-', '_').upper()}")
+
+    return value
+
 @sio.on("connect")
 async def connect(sid, environ, auth=None):
     if (
@@ -133,16 +143,18 @@ async def connect(sid, environ, auth=None):
     def emit_call_fn(event: Literal["ask", "call_fn"], data, timeout):
         return sio.call(event, data, timeout=timeout, to=sid)
 
-    session_id = environ.get("HTTP_X_CHAINLIT_SESSION_ID")
+    print(f"environ: {environ}")    
+    session_id =  get_ws_header_parameter(environ, "X-Chainlit-Session-Id")
+
     if restore_existing_session(sid, session_id, emit_fn, emit_call_fn):
         return True
 
-    user_env_string = environ.get("HTTP_USER_ENV")
+    user_env_string = get_ws_header_parameter(environ, "user-env")
     user_env = load_user_env(user_env_string)
 
-    client_type = environ.get("HTTP_X_CHAINLIT_CLIENT_TYPE")
+    client_type = get_ws_header_parameter(environ, "X-Chainlit-Client-Type")
     http_referer = environ.get("HTTP_REFERER")
-    url_encoded_chat_profile = environ.get("HTTP_X_CHAINLIT_CHAT_PROFILE")
+    url_encoded_chat_profile = get_ws_header_parameter(environ, "X-Chainlit-Chat-Profile") 
     chat_profile = (
         unquote(url_encoded_chat_profile) if url_encoded_chat_profile else None
     )
@@ -157,7 +169,7 @@ async def connect(sid, environ, auth=None):
         user=user,
         token=token,
         chat_profile=chat_profile,
-        thread_id=environ.get("HTTP_X_CHAINLIT_THREAD_ID"),
+        thread_id= get_ws_header_parameter(environ, "X-Chainlit-Thread-Id"),
         languages=environ.get("HTTP_ACCEPT_LANGUAGE"),
         http_referer=http_referer,
     )
