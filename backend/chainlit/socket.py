@@ -155,6 +155,8 @@ async def connect(sid, environ, auth=None):
         languages=environ.get("HTTP_ACCEPT_LANGUAGE"),
         http_referer=http_referer,
         http_path=environ.get("PATH_INFO"),
+        http_query=environ.get("QUERY_STRING"),
+        http_headers=environ.get("asgi.scope", {}).get("headers"),
     )
 
     trace_event("connection_successful")

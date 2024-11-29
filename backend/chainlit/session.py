@@ -3,7 +3,7 @@ import json
 import mimetypes
 import shutil
 import uuid
-from typing import TYPE_CHECKING, Any, Callable, Deque, Dict, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Deque, Dict, Literal, Optional, Union,Tuple, List
 
 import aiofiles
 
@@ -66,6 +66,10 @@ class BaseSession:
         http_referer: Optional[str] = None,
         # Request path
         http_path: Optional[str] = None,
+        # Rquest Query String
+        http_query: Optional[str] = None,
+        # Request headers
+        http_headers: Optional[List[Tuple[str, str]]] = None,
     ):
         if thread_id:
             self.thread_id_to_resume = thread_id
@@ -78,6 +82,8 @@ class BaseSession:
         self.chat_profile = chat_profile
         self.http_referer = http_referer
         self.http_path = http_path
+        self.http_query = http_query
+        self.http_headers = http_headers
 
         self.files: Dict[str, FileDict] = {}
 
@@ -149,6 +155,8 @@ class BaseSession:
         user_session["chat_profile"] = self.chat_profile
         user_session["http_referer"] = self.http_referer
         user_session["client_type"] = self.client_type
+        user_session["http_path"] = self.http_path
+        user_session["http_query"] = self.http_query
         metadata = clean_metadata(user_session)
         return metadata
 
@@ -172,6 +180,10 @@ class HTTPSession(BaseSession):
         http_referer: Optional[str] = None,
         # Request path
         http_path: Optional[str] = None,
+        # Rquest Query String
+        http_query: Optional[str] = None,
+        # Request headers
+        http_headers: Optional[List[Tuple[str, str]]] = None,
     ):
         super().__init__(
             id=id,
@@ -182,6 +194,8 @@ class HTTPSession(BaseSession):
             user_env=user_env,
             http_referer=http_referer,
             http_path=http_path,
+            http_query=http_query,
+            http_headers=http_headers,
         )
 
     def delete(self):
@@ -234,6 +248,10 @@ class WebsocketSession(BaseSession):
         http_referer: Optional[str] = None,
         # Request Path
         http_path: Optional[str] = None,
+        # Rquest Query String
+        http_query: Optional[str] = None,
+        # Request headers
+        http_headers: Optional[List[Tuple[str, str]]] = None,
     ):
         super().__init__(
             id=id,
@@ -245,6 +263,8 @@ class WebsocketSession(BaseSession):
             chat_profile=chat_profile,
             http_referer=http_referer,
             http_path=http_path,
+            http_query=http_query,
+            http_headers=http_headers,
         )
 
         self.socket_id = socket_id

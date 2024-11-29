@@ -30,7 +30,9 @@ class UserSession:
         user_session["http_referer"] = context.session.http_referer
         user_session["client_type"] = context.session.client_type
         user_session["http_path"] = context.session.http_path
-
+        user_session["http_query"] = context.session.http_query
+        user_session["http_headers"] = context.session.http_headers 
+        
         if isinstance(context.session, WebsocketSession):
             user_session["languages"] = context.session.languages
 
