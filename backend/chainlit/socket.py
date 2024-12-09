@@ -143,7 +143,6 @@ async def connect(sid, environ, auth=None):
     def emit_call_fn(event: Literal["ask", "call_fn"], data, timeout):
         return sio.call(event, data, timeout=timeout, to=sid)
 
-    print(f"environ: {environ}")    
     session_id =  get_ws_header_parameter(environ, "X-Chainlit-Session-Id")
 
     if restore_existing_session(sid, session_id, emit_fn, emit_call_fn):
